@@ -23,13 +23,7 @@ const app = express();
 app.use(express.json()); //add body parser to each following route handler
 app.use(cors()); //add CORS support to each following route handler
 
-const client = new Client({
-  user: "academy",
-  password: "",
-  host: "localhost",
-  port: 5432,
-  database: "checklist",
-}); // defines the client config
+const client = new Client(dbConfig); // defines the client config
 client.connect();
 
 // query for all values from the database
@@ -46,7 +40,8 @@ app.get("/start-up/viewpost", async (req, res) => {
     );
     res.json(allPosts.rows);
   } catch (err) {
-    console.log(err.message);
+    console.log(err.message)
+    res.sendStatus(500);
   }
 });
 
@@ -83,12 +78,15 @@ app.put("/start-up/post/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { description } = req.body;
+    console.log(id,description)
     const editTodo = await client.query(
-      "UPDATE checklist sert post_description = $1 where post_id = $2",
+      "UPDATE checklist set post_description = $1 where post_id = $2",
       [description, id]
-    );
+    )
+    res.sendStatus(200);
   } catch (err) {
-    console.log(err.message);
+    console.log(err.message)
+    res.sendStatus(500);
   }
 });
 
